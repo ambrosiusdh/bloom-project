@@ -6,7 +6,6 @@
     <title>Laravel</title>
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet" type="text/css">
     <link href="{{ mix('css/app.css') }}" type="text/css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <meta name="csrf-token" value="{{ csrf_token() }}" />
 </head>
 <body>

@@ -5,13 +5,19 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 import VueRouter from 'vue-router';
-Vue.use(VueRouter);
-
 import VueAxios from 'vue-axios';
 import axios from 'axios';
+import FontAwesome from '@fortawesome/fontawesome-free/css/all.min.css';
+import Moment from 'moment';
 
 import App from './components/App';
-Vue.use(VueAxios, axios);
+Vue.use(
+    VueRouter,
+    VueAxios,
+    axios,
+    FontAwesome,
+    Moment
+);
 
 import Cashier from './components/cashier/Cashier';
 import Data from './components/data/Data';
