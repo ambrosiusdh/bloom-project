@@ -9,14 +9,17 @@ import VueAxios from 'vue-axios';
 import axios from 'axios';
 import FontAwesome from '@fortawesome/fontawesome-free/css/all.min.css';
 import Moment from 'moment';
+import Vuex from 'vuex'
 
 import App from './components/App';
+
 Vue.use(
     VueRouter,
     VueAxios,
     axios,
     FontAwesome,
-    Moment
+    Moment,
+    Vuex
 );
 
 import Cashier from './components/cashier/Cashier';
@@ -46,6 +49,17 @@ const routes = [
         component: Cashier
     }
 ];
+const router = new VueRouter({mode: 'history', routes: routes});
+import menuModules from './modules/menuModules'
 
-const router = new VueRouter({ mode: 'history', routes: routes});
-const app = new Vue(Vue.util.extend({ router }, App)).$mount('#app');
+const store = new Vuex.Store({
+    modules: [menuModules]
+});
+
+new Vue({
+    el: '#app',
+    render: h => h(App),
+    router,
+    store,
+});
+

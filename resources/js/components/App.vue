@@ -1,24 +1,28 @@
 <template>
     <div class="app">
         <div class="app__sidebar-burger">
-            <div class="app__sidebar-burger-item">
-                <i @click="toggleMenu" class="fa fa-bars" :class="{'app__sidebar-burger-item-rotated': showMenu}"></i>
+            <div class="app__sidebar-burger-item" @click="toggleMenu">
+                <i class="fa fa-bars" :class="{'app__sidebar-burger-item-rotated': showMenu}"></i>
             </div>
             <transition name="fade">
                 <ul class="app__sidebar-burger-list" v-show="!showMenu">
-                    <li class="app__sidebar-burger-list-item">
+                    <li class="app__sidebar-burger-list-item"
+                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'dashboard'}">
                         <router-link :to="{name: 'index'}" @click.native="changeActiveMenu('dashboard')"><i
                             class="fas fa-chart-line"></i></router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item">
+                    <li class="app__sidebar-burger-list-item"
+                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'data'}">
                         <router-link :to="{name: 'data'}" @click.native="changeActiveMenu('data')"><i
                             class="fas fa-database"></i></router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item">
+                    <li class="app__sidebar-burger-list-item"
+                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'history'}">
                         <router-link :to="{name: 'history'}" @click.native="changeActiveMenu('history')"><i
                             class="fas fa-scroll"></i></router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item">
+                    <li class="app__sidebar-burger-list-item"
+                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'cashier'}">
                         <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
                             class="fas fa-dollar-sign"></i></router-link>
                     </li>
@@ -28,22 +32,22 @@
         <div class="app__sidebar" :class="{'app__sidebar-show': showMenu}">
             <ul class="app__sidebar-list">
                 <li class="app__sidebar-list-item"
-                    :class="{'app__sidebar-list-item-active': activeMenu === 'dashboard'}">
+                    :class="{'app__sidebar-list-item-active': currentMenu === 'dashboard'}">
                     <router-link :to="{name: 'index'}" @click.native="changeActiveMenu('dashboard')"><i
                         class="fas fa-chart-line"></i> Dashboard
                     </router-link>
                 </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': activeMenu === 'data'}">
+                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'data'}">
                     <router-link :to="{name: 'data'}" @click.native="changeActiveMenu('data')"><i
                         class="fas fa-database"></i> Data
                     </router-link>
                 </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': activeMenu === 'history'}">
+                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'history'}">
                     <router-link :to="{name: 'history'}" @click.native="changeActiveMenu('history')"><i
                         class="fas fa-scroll"></i> History
                     </router-link>
                 </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': activeMenu === 'cashier'}">
+                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'cashier'}">
                     <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
                         class="fas fa-dollar-sign"></i> Cashier
                     </router-link>
@@ -59,7 +63,9 @@
                     </li>
                 </ul>
             </nav>
-            <router-view></router-view>
+            <div class="app__main-content">
+                <router-view @changeMenu="changeActiveMenu"></router-view>
+            </div>
         </div>
 
     </div>
@@ -67,13 +73,14 @@
 
 <script>
     import moment from 'moment'
+    import * as constant from "../constant/modulesConstant"
+    import {mapGetters, mapActions} from "vuex"
 
     export default {
         name: "App",
         data: function () {
             return {
                 showMenu: false,
-                activeMenu: "dashboard",
                 currentTime: ""
             }
         },
@@ -82,13 +89,17 @@
                 this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a')
             }, 1000)
         },
+        computed: {
+            ...mapGetters({
+                currentMenu: constant.CURRENT_MENU
+            })
+        },
         methods: {
+            ...mapActions([
+                'changeActiveMenu'
+            ]),
             toggleMenu() {
                 this.showMenu = !this.showMenu;
-            },
-            changeActiveMenu(menu) {
-                this.activeMenu = menu;
-                console.log(this.activeMenu);
             }
         }
     }
@@ -99,6 +110,7 @@
     .fade-enter-active, .fade-leave-active {
         transition: opacity .5s;
     }
+
     .fade-enter, .fade-leave-to {
         opacity: 0;
     }
@@ -155,7 +167,6 @@
     }
 
     .app__sidebar-burger {
-        padding-top: 5px;
         text-align: center;
         width: 3%;
         height: 100vh;
@@ -167,22 +178,31 @@
         z-index: 10;
     }
 
-    .app__sidebar-burger-item .fa-bars {
-        color: #C51F31;
+    .app__sidebar-burger-item{
+        padding-top: 10px;
         cursor: pointer;
+    }
+
+    .app__sidebar-burger-item .fa-bars {
+        color: white;
         transition: 0.3s;
     }
 
-    .app__sidebar-burger-item-rotated {
+    .app__sidebar-burger-item .app__sidebar-burger-item-rotated {
         transform: rotate(90deg);
+        color: #C51F31;
     }
 
     .app__sidebar-burger-list {
         padding: 0;
     }
 
+    .app__sidebar-burger-list-item{
+        transition: 0.5s;
+    }
+
     .app__sidebar-burger-list-item a {
-        padding: 10px 0;
+        padding: 10.5px 0;
         display: block;
         color: white;
         transition: 0.2s;
@@ -191,6 +211,14 @@
     .app__sidebar-burger-list-item a:hover {
         color: lightgrey;
         text-decoration: none;
+    }
+
+    .app__sidebar-burger-list-item-active{
+        background-color: #111;
+    }
+
+    .app__sidebar-burger-list-item-active a, .app__sidebar-burger-list-item-active a:hover{
+        color: #C51F31;
     }
 
     .app__main-layout {
@@ -207,6 +235,12 @@
     .app__main-layout-navbar {
         background-color: #444;
         color: white;
+    }
+
+    .app__main-content{
+        padding-top: 20px;
+        min-height: 95vh;
+        background-color: #E8ECEF;
     }
 
 </style>
