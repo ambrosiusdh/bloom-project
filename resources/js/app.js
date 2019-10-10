@@ -26,6 +26,7 @@ import Cashier from './components/cashier/Cashier';
 import Data from './components/data/Data';
 import History from './components/history/History';
 import Dashboard from './components/dashboard/Dashboard';
+import Login from './components/login/Login';
 
 const routes = [
     {
@@ -47,7 +48,17 @@ const routes = [
         name: 'cashier',
         path: '/cashier',
         component: Cashier
+    },
+    {
+        name: 'login',
+        path: '/login',
+        component: Login
+    },
+    {
+        path: '*',
+        component: NotFound
     }
+
 ];
 const router = new VueRouter({mode: 'history', routes: routes});
 import menuModules from './modules/menuModules'

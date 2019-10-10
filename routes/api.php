@@ -17,6 +17,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/get-user-session', 'UserSessionController@getUserSession');
+Route::post('/login-user', 'UserSessionController@loginUser');
+
 Route::resource('/user', 'UserController');
 Route::resource('/item', 'ItemController');
 Route::resource('/item-type', 'ItemTypeController');

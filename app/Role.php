@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Role extends Model
 {
     public function userRole(){
-        return $this->hasOne('App\UserRole', "userId");
+        return $this->hasOne("App\userRole", "roleId");
     }
 }

@@ -1,61 +1,69 @@
 <template>
     <div class="app">
-        <div class="app__sidebar-burger">
-            <div class="app__sidebar-burger-item" @click="toggleMenu">
-                <i class="fa fa-bars" :class="{'app__sidebar-burger-item-rotated': showMenu}"></i>
+        <div class="app--signed" v-if="currentMenu !== 'login'">
+            <div class="app__sidebar-burger">
+                <div class="app__sidebar-burger-item" @click="toggleMenu">
+                    <i class="fa fa-bars" :class="{'app__sidebar-burger-item-rotated': showMenu}"></i>
+                </div>
+                <transition name="fade">
+                    <ul class="app__sidebar-burger-list" v-show="!showMenu">
+                        <li class="app__sidebar-burger-list-item"
+                            :class="{'app__sidebar-burger-list-item-active': currentMenu === 'dashboard'}">
+                            <router-link :to="{name: 'index'}" @click.native="changeActiveMenu('dashboard')"><i
+                                class="fas fa-chart-line"></i></router-link>
+                        </li>
+                        <li class="app__sidebar-burger-list-item"
+                            :class="{'app__sidebar-burger-list-item-active': currentMenu === 'data'}">
+                            <router-link :to="{name: 'data'}" @click.native="changeActiveMenu('data')"><i
+                                class="fas fa-database"></i></router-link>
+                        </li>
+                        <li class="app__sidebar-burger-list-item"
+                            :class="{'app__sidebar-burger-list-item-active': currentMenu === 'history'}">
+                            <router-link :to="{name: 'history'}" @click.native="changeActiveMenu('history')"><i
+                                class="fas fa-scroll"></i></router-link>
+                        </li>
+                        <li class="app__sidebar-burger-list-item"
+                            :class="{'app__sidebar-burger-list-item-active': currentMenu === 'cashier'}">
+                            <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
+                                class="fas fa-dollar-sign"></i></router-link>
+                        </li>
+                        <li class="app__sidebar-burger-list-item app__sidebar-burger-list-logout">
+                            <router-link :to="{name: 'login'}" ><i class="fas fa-sign-out-alt"></i></router-link>
+                        </li>
+                    </ul>
+                </transition>
             </div>
-            <transition name="fade">
-                <ul class="app__sidebar-burger-list" v-show="!showMenu">
-                    <li class="app__sidebar-burger-list-item"
-                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'dashboard'}">
+            <div class="app__sidebar" :class="{'app__sidebar-show': showMenu}">
+                <ul class="app__sidebar-list">
+                    <li class="app__sidebar-list-item"
+                        :class="{'app__sidebar-list-item-active': currentMenu === 'dashboard'}">
                         <router-link :to="{name: 'index'}" @click.native="changeActiveMenu('dashboard')"><i
-                            class="fas fa-chart-line"></i></router-link>
+                            class="fas fa-chart-line"></i> Dashboard
+                        </router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item"
-                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'data'}">
+                    <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'data'}">
                         <router-link :to="{name: 'data'}" @click.native="changeActiveMenu('data')"><i
-                            class="fas fa-database"></i></router-link>
+                            class="fas fa-database"></i> Data
+                        </router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item"
-                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'history'}">
+                    <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'history'}">
                         <router-link :to="{name: 'history'}" @click.native="changeActiveMenu('history')"><i
-                            class="fas fa-scroll"></i></router-link>
+                            class="fas fa-scroll"></i> History
+                        </router-link>
                     </li>
-                    <li class="app__sidebar-burger-list-item"
-                        :class="{'app__sidebar-burger-list-item-active': currentMenu === 'cashier'}">
+                    <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'cashier'}">
                         <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
-                            class="fas fa-dollar-sign"></i></router-link>
+                            class="fas fa-dollar-sign"></i> Cashier
+                        </router-link>
+                    </li>
+                    <li class="app__sidebar-list-item app__sidebar-list-logout">
+                        <router-link :to="{name: 'login'}"><i class="fas fa-sign-out-alt"></i> Sign Out
+                        </router-link>
                     </li>
                 </ul>
-            </transition>
+            </div>
         </div>
-        <div class="app__sidebar" :class="{'app__sidebar-show': showMenu}">
-            <ul class="app__sidebar-list">
-                <li class="app__sidebar-list-item"
-                    :class="{'app__sidebar-list-item-active': currentMenu === 'dashboard'}">
-                    <router-link :to="{name: 'index'}" @click.native="changeActiveMenu('dashboard')"><i
-                        class="fas fa-chart-line"></i> Dashboard
-                    </router-link>
-                </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'data'}">
-                    <router-link :to="{name: 'data'}" @click.native="changeActiveMenu('data')"><i
-                        class="fas fa-database"></i> Data
-                    </router-link>
-                </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'history'}">
-                    <router-link :to="{name: 'history'}" @click.native="changeActiveMenu('history')"><i
-                        class="fas fa-scroll"></i> History
-                    </router-link>
-                </li>
-                <li class="app__sidebar-list-item" :class="{'app__sidebar-list-item-active': currentMenu === 'cashier'}">
-                    <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
-                        class="fas fa-dollar-sign"></i> Cashier
-                    </router-link>
-                </li>
-            </ul>
-        </div>
-
-        <div class="app__main-layout" :class="{'app__main-sidebar-show': showMenu}">
+        <div class="app__main-layout" :class="mainLayoutClassComputed">
             <nav class="navbar navbar-light navbar-expand-lg app__main-layout-navbar">
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
@@ -67,7 +75,6 @@
                 <router-view @changeMenu="changeActiveMenu"></router-view>
             </div>
         </div>
-
     </div>
 </template>
 
@@ -81,22 +88,40 @@
         data: function () {
             return {
                 showMenu: false,
-                currentTime: ""
+                currentTime: "",
+                mainLayoutClass: {
+                    'app__main-sidebar-show': this.showMenu,
+                    'app__main-layout-login': this.currentMenu === 'login'
+                },
+                csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             }
         },
         created() {
+            this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
             setInterval(() => {
-                this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a')
-            }, 1000)
+                this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+            }, 1000);
+
+            this.changeActiveMenu(this.$route.name);
+            this.changeCsrfToken(this.csrfToken);
+            this.$router.push({name: "index"})
+
         },
         computed: {
             ...mapGetters({
                 currentMenu: constant.CURRENT_MENU
-            })
+            }),
+            mainLayoutClassComputed: function () {
+                return {
+                    'app__main-sidebar-show': this.showMenu,
+                    'app__main-layout-login': this.currentMenu === 'login'
+                }
+            }
         },
         methods: {
             ...mapActions([
-                'changeActiveMenu'
+                'changeActiveMenu',
+                'changeCsrfToken'
             ]),
             toggleMenu() {
                 this.showMenu = !this.showMenu;
@@ -172,7 +197,6 @@
         height: 100vh;
         background-color: #222;
         font-size: 20px;
-        color: #C51F31;
         position: fixed;
         left: 0;
         z-index: 10;
@@ -221,10 +245,26 @@
         color: #C51F31;
     }
 
+    .app__sidebar-list-logout{
+        position: absolute;
+        bottom: 0;
+    }
+
+    .app__sidebar-burger-list-logout{
+        position: absolute;
+        bottom: 0;
+        left: 1vw;
+    }
+
     .app__main-layout {
         width: 97%;
         margin-left: 3%;
         transition: 0.5s;
+    }
+
+    .app .app__main-layout-login{
+        margin-left: 0;
+        width: 100%;
     }
 
     .app__main-sidebar-show {
