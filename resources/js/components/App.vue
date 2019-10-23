@@ -1,6 +1,10 @@
 <template>
     <div class="app">
-        <div class="app--signed" v-if="currentMenu !== 'login'">
+        <div class="app--loading-overlay" v-show="isLoading">
+            <LoadingOverlay></LoadingOverlay>
+        </div>
+
+        <div class="app--signed" v-if="checkCurrentMenu">
             <div class="app__sidebar-burger">
                 <div class="app__sidebar-burger-item" @click="toggleMenu">
                     <i class="fa fa-bars" :class="{'app__sidebar-burger-item-rotated': showMenu}"></i>
@@ -27,8 +31,8 @@
                             <router-link :to="{name: 'cashier'}" @click.native="changeActiveMenu('cashier')"><i
                                 class="fas fa-dollar-sign"></i></router-link>
                         </li>
-                        <li class="app__sidebar-burger-list-item app__sidebar-burger-list-logout">
-                            <router-link :to="{name: 'login'}" ><i class="fas fa-sign-out-alt"></i></router-link>
+                        <li class="app__sidebar-burger-list-item app__sidebar-burger-list-logout" @click="userSignout()">
+                            <i class="fas fa-sign-out-alt"></i>
                         </li>
                     </ul>
                 </transition>
@@ -56,15 +60,15 @@
                             class="fas fa-dollar-sign"></i> Cashier
                         </router-link>
                     </li>
-                    <li class="app__sidebar-list-item app__sidebar-list-logout">
-                        <router-link :to="{name: 'login'}"><i class="fas fa-sign-out-alt"></i> Sign Out
-                        </router-link>
+                    <li class="app__sidebar-list-item app__sidebar-list-logout" @click="userSignout()">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
                     </li>
                 </ul>
             </div>
         </div>
         <div class="app__main-layout" :class="mainLayoutClassComputed">
             <nav class="navbar navbar-light navbar-expand-lg app__main-layout-navbar">
+                {{ user.length ? "Welcome, " + user : ""}}
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
                         {{currentTime}}
@@ -72,7 +76,7 @@
                 </ul>
             </nav>
             <div class="app__main-content">
-                <router-view @changeMenu="changeActiveMenu"></router-view>
+                <router-view @userHasLogin="setUser"></router-view>
             </div>
         </div>
     </div>
@@ -82,49 +86,84 @@
     import moment from 'moment'
     import * as constant from "../constant/modulesConstant"
     import {mapGetters, mapActions} from "vuex"
+    import LoadingOverlay from "./utility/LoadingOverlay";
 
     export default {
         name: "App",
+        components: {LoadingOverlay},
         data: function () {
             return {
                 showMenu: false,
                 currentTime: "",
-                mainLayoutClass: {
-                    'app__main-sidebar-show': this.showMenu,
-                    'app__main-layout-login': this.currentMenu === 'login'
-                },
-                csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                user: ""
             }
         },
         created() {
-            this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
-            setInterval(() => {
-                this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
-            }, 1000);
-
+            this.setCurrentTime();
             this.changeActiveMenu(this.$route.name);
             this.changeCsrfToken(this.csrfToken);
-            this.$router.push({name: "index"})
-
+            this.setUser();
+            this.checkSession();
         },
         computed: {
             ...mapGetters({
-                currentMenu: constant.CURRENT_MENU
+                currentMenu: constant.CURRENT_MENU,
+                apiPath: constant.API_PATH,
+                isLoading: constant.IS_LOADING
             }),
             mainLayoutClassComputed: function () {
                 return {
                     'app__main-sidebar-show': this.showMenu,
-                    'app__main-layout-login': this.currentMenu === 'login'
+                    'app__main-without-layout': this.currentMenu === 'login' || this.currentMenu === 'notFound'
                 }
+            },
+            checkCurrentMenu: function(){
+                return this.currentMenu !== 'login' && this.currentMenu !== 'notFound'
             }
         },
         methods: {
             ...mapActions([
                 'changeActiveMenu',
-                'changeCsrfToken'
+                'changeCsrfToken',
+                'changeIsLoading'
             ]),
+            setCurrentTime(){
+                this.currentTime = moment().format('MMMM Do YYYY, h:mm:ss a');
+                setTimeout(this.setCurrentTime, 1000);
+            },
+            setUser(){
+                if(this.$session.has('userFullName')) {
+                    this.user = this.$session.get('userFullName');
+                }
+            },
+            checkSession(){
+                if(!this.$session.get('username')) {
+                    this.userSignout();
+                    return true;
+                }
+            },
             toggleMenu() {
                 this.showMenu = !this.showMenu;
+            },
+            userSignout() {
+                this.$session.destroy();
+                this.user = "";
+                this.$router.push({name: "login"});
+                setTimeout(()=>{
+                    this.changeActiveMenu('login');
+                }, 50);
+            }
+        },
+        watch: {
+            $route(to, from){
+                clearTimeout();
+                if(this.checkSession()){
+                    return;
+                }
+                setTimeout(()=>{
+                    this.$session.destroy();
+                }, 900000);
             }
         }
     }
@@ -143,6 +182,14 @@
     .app {
         background-color: #F6F7EB;
         font-family: "Trebuchet MS";
+    }
+
+    .app--loading-overlay{
+        height: 100vh;
+        width: 100vw;
+        position: absolute;
+        z-index: 10;
+        background-color: rgba(0,0,0,0.5);
     }
 
     .app__sidebar {
@@ -166,16 +213,16 @@
 
     .app__sidebar-list-item {
         list-style-type: none;
-        transition: 0.2s;
     }
 
     .app__sidebar-list-item a {
         color: white;
         display: block;
         padding: 15px 10px;
+        transition: 0.2s;
     }
 
-    .app__sidebar-list-item:hover a {
+    .app__sidebar-list-item a:hover {
         color: lightgrey;
         text-decoration: none;
     }
@@ -248,12 +295,29 @@
     .app__sidebar-list-logout{
         position: absolute;
         bottom: 0;
+        color: white;
+        display: block;
+        padding: 15px 10px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .app__sidebar-list-logout:hover{
+        color: lightgrey;
     }
 
     .app__sidebar-burger-list-logout{
         position: absolute;
-        bottom: 0;
+        bottom: 1vh;
         left: 1vw;
+        list-style-type: none;
+        cursor: pointer;
+        transition: 0.2s;
+        color: white;
+    }
+
+    .app__sidebar-burger-list-logout:hover {
+        color: lightgrey;
     }
 
     .app__main-layout {
@@ -262,7 +326,7 @@
         transition: 0.5s;
     }
 
-    .app .app__main-layout-login{
+    .app .app__main-without-layout{
         margin-left: 0;
         width: 100%;
     }

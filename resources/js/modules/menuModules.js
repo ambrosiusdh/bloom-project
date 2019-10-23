@@ -4,7 +4,8 @@ const state = {
     currentMenu: "dashboard",
     nearEmptyQuantity: 1,
     apiPath: "http://localhost:8000/",
-    csrfToken: ""
+    csrfToken: "",
+    isLoading: false
 };
 
 const getters = {
@@ -19,6 +20,9 @@ const getters = {
     },
     [constant.CSRF_TOKEN]: function (state) {
         return state.csrfToken;
+    },
+    [constant.IS_LOADING]: function (state) {
+        return state.isLoading;
     }
 };
 
@@ -31,6 +35,9 @@ const mutations = {
     },
     changeCsrfToken: function(state, payload){
         state.csrfToken = payload;
+    },
+    changeIsLoading: function(state, payload){
+        state.isLoading = payload;
     }
 };
 
@@ -43,6 +50,9 @@ const actions = {
     },
     changeCsrfToken: function({commit}, payload){
         commit("changeCsrfToken", payload);
+    },
+    changeIsLoading: function({commit}, payload){
+        commit("changeIsLoading", payload);
     }
 };
 

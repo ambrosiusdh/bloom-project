@@ -10,8 +10,13 @@ import axios from 'axios';
 import FontAwesome from '@fortawesome/fontawesome-free/css/all.min.css';
 import Moment from 'moment';
 import Vuex from 'vuex'
+import VueSession from 'vue-session';
 
 import App from './components/App';
+
+const options = {
+    persist: true
+};
 
 Vue.use(
     VueRouter,
@@ -22,11 +27,14 @@ Vue.use(
     Vuex
 );
 
+Vue.use(VueSession, options);
+
 import Cashier from './components/cashier/Cashier';
 import Data from './components/data/Data';
 import History from './components/history/History';
 import Dashboard from './components/dashboard/Dashboard';
 import Login from './components/login/Login';
+import NotFound from './components/error/Error404.vue'
 
 const routes = [
     {
@@ -55,6 +63,7 @@ const routes = [
         component: Login
     },
     {
+        name: 'notFound',
         path: '*',
         component: NotFound
     }

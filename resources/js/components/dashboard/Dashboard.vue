@@ -220,6 +220,7 @@
     .dashboard-summary__content-item-detail-quantity{
         font-size: 48px;
         line-height: 42px;
+        margin-left: -10px;
         font-weight: bold;
     }
 
